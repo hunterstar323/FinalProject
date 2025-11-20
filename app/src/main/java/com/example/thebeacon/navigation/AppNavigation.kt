@@ -93,7 +93,7 @@ fun AppNavigation() {
         }
 
 
-        // Declaración del composable con argumento:
+
         composable(AppRoutes.ContentDetail.route) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
 
