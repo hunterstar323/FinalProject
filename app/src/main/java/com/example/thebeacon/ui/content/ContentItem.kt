@@ -12,15 +12,15 @@ data class ContentItem(
 val sampleContents = listOf(
     ContentItem(
         id = "c1",
-        title = "La Gran Aventura",
-        summary = "Una épica travesía por mundos increíbles en un mundo mágico.",
+        title = "TEST",
+        summary = "AAAAA.",
         genres = listOf("Aventura", "Acción"),
         platforms = listOf("Netflix")
     ),
     ContentItem(
         id = "c2",
-        title = "Comedia del Siglo",
-        summary = "Situaciones ridículas que te harán reír durante horas.",
+        title = "TEST2",
+        summary = "AYYUDA.",
         genres = listOf("Comedia"),
         platforms = listOf("HBO", "Prime Video")
     )

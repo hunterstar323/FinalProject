@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProfileScreen(
     userName: String = "Usuario Ejemplo",
-    onGoToFavorites: () -> Unit,
+    onGoToAddMovie: () -> Unit,
     onLogout: () -> Unit
 ) {
 
@@ -32,11 +32,12 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { onGoToFavorites() },
+            onClick = { onGoToAddMovie() },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Ver Favoritos")
+            Text("Agregar Película")
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 

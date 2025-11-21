@@ -1,26 +1,21 @@
 package com.example.thebeacon.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.thebeacon.ui.content.ContentDetailScreen
+import com.example.thebeacon.ui.addmovie.AddMovieScreen
 import com.example.thebeacon.ui.login.LoginScreen
 import com.example.thebeacon.ui.register.RegisterScreen
 import com.example.thebeacon.ui.home.HomeScreen
 import com.example.thebeacon.ui.profile.ProfileScreen
-import com.example.thebeacon.ui.favorites.FavoritesScreen
-import com.example.thebeacon.viewmodel.ContentDetailViewModel
 
 sealed class AppRoutes(val route: String) {
     object Login : AppRoutes("login")
     object Register : AppRoutes("register")
     object Home : AppRoutes("home")
     object Profile : AppRoutes("profile")
-    object Favorites : AppRoutes("favorites")
+    object AddMovie : AppRoutes("add_movie")
 
     object ContentDetail : AppRoutes("content_detail/{id}") {
         fun createRoute(id: String) = "content_detail/$id"
@@ -69,8 +64,8 @@ fun AppNavigation() {
         composable(AppRoutes.Profile.route) {
             ProfileScreen(
                 userName = "Usuario Ejemplo",
-                onGoToFavorites = {
-                    navController.navigate(AppRoutes.Favorites.route)
+                onGoToAddMovie = {
+                    navController.navigate(AppRoutes.AddMovie.route)
                 },
                 onLogout = {
                     navController.navigate(AppRoutes.Login.route) {
@@ -80,9 +75,9 @@ fun AppNavigation() {
             )
         }
 
-        // FAVORITES
-        composable(AppRoutes.Favorites.route) {
-            FavoritesScreen(navController)
+        // ADD MOVIE
+        composable(AppRoutes.AddMovie.route) {
+            AddMovieScreen(navController)
         }
 
         // HOME
@@ -95,7 +90,6 @@ fun AppNavigation() {
             )
         }
 
-        // DETALLE CON VIEWMODEL + API REAL
-
+        // (Pendiente) DETALLE REAL DE PELÍCULA — cuando tengas el viewmodel listo
     }
 }

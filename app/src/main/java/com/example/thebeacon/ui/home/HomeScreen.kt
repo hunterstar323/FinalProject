@@ -45,7 +45,6 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
 
-        // 🔥 Chips de filtro
         var selectedGenre by remember { mutableStateOf("all") }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
