@@ -6,13 +6,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.thebeacon.data.remote.model.Movie
 
 @Composable
 fun ContentDetailScreen(
-    item: ContentItem,
+    movie: Movie,
     onBack: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -21,14 +21,14 @@ fun ContentDetailScreen(
             Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
         Text(
-            text = item.title,
+            text = movie.title,
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
         Box(
             modifier = Modifier
@@ -37,17 +37,17 @@ fun ContentDetailScreen(
                 .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
-        Text("Resumen", style = MaterialTheme.typography.titleMedium)
-        Text(item.summary, modifier = Modifier.padding(top = 8.dp))
+        Text("Descripción", style = MaterialTheme.typography.titleMedium)
+        Text(movie.description, modifier = Modifier.padding(top = 8.dp))
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(Modifier.height(20.dp))
 
-        Text("Géneros: ${item.genres.joinToString(", ")}")
+        Text("Género: ${movie.genre}")
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(Modifier.height(10.dp))
 
-        Text("Disponible en: ${item.platforms.joinToString(" • ")}")
+        Text("⭐ ${movie.average_rating} (${movie.rating_count} votos)")
     }
 }

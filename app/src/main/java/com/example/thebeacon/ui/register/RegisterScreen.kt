@@ -6,16 +6,35 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.thebeacon.viewmodel.AuthViewModel
+import com.example.thebeacon.viewmodel.AuthViewModelFactory
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.thebeacon.util.SessionManager
 
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
-    onBackToLogin: () -> Unit
+    onBackToLogin: () -> Unit,
+    viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory())
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     var email by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var errorMsg by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    // Cuando hay registerResponse → (opcional) puedes guardar uid o navegar
+    uiState.registerResponse?.let { resp ->
+        LaunchedEffect(resp) {
+            // si quieres: guardar uid localmente
+            val session = SessionManager(context)
+            session.saveAuth("", "", resp.uid, email) // no hay token en register
+            viewModel.resetState()
+            onRegisterSuccess()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -33,7 +52,8 @@ fun RegisterScreen(
             value = email,
             onValueChange = { email = it },
             label = { Text("Correo") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         )
 
         Spacer(Modifier.height(10.dp))
@@ -42,7 +62,8 @@ fun RegisterScreen(
             value = username,
             onValueChange = { username = it },
             label = { Text("Usuario") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         )
 
         Spacer(Modifier.height(10.dp))
@@ -51,23 +72,24 @@ fun RegisterScreen(
             value = password,
             onValueChange = { password = it },
             label = { Text("Contraseña") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         )
 
         Spacer(Modifier.height(20.dp))
 
         Button(
             onClick = {
-                if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
-                    errorMsg = "Todos los campos son obligatorios"
-                } else {
-                    // Simulación, luego conectamos al backend POST /register/
-                    onRegisterSuccess()
-                }
+                viewModel.register(username.trim(), email.trim(), password)
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         ) {
-            Text("Registrarse")
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
+            } else {
+                Text("Registrarse")
+            }
         }
 
         Spacer(Modifier.height(8.dp))
@@ -76,9 +98,9 @@ fun RegisterScreen(
             Text("Volver al login")
         }
 
-        if (errorMsg.isNotEmpty()) {
+        uiState.error?.let {
             Spacer(Modifier.height(10.dp))
-            Text(errorMsg, color = MaterialTheme.colorScheme.error)
+            Text(it, color = MaterialTheme.colorScheme.error)
         }
     }
 }

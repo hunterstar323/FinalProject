@@ -6,15 +6,34 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.thebeacon.viewmodel.AuthViewModel
+import com.example.thebeacon.viewmodel.AuthViewModelFactory
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.thebeacon.util.SessionManager
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onGoToRegister: () -> Unit
+    onGoToRegister: () -> Unit,
+    viewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory())
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var errorMsg by remember { mutableStateOf("") }
+
+    // Cuando se recibe loginResponse con token → guardamos sesión y navegamos
+    uiState.loginResponse?.let { resp ->
+        // guardamos token/uid localmente y navegamos
+        val session = SessionManager(context)
+        session.saveAuth(resp.idToken, resp.refreshToken, resp.uid, resp.email)
+        LaunchedEffect(resp) {
+            viewModel.resetState()
+            onLoginSuccess()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -23,7 +42,6 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
         Text("Iniciar Sesión", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(Modifier.height(20.dp))
@@ -32,7 +50,8 @@ fun LoginScreen(
             value = email,
             onValueChange = { email = it },
             label = { Text("Correo") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         )
 
         Spacer(Modifier.height(10.dp))
@@ -41,21 +60,22 @@ fun LoginScreen(
             value = password,
             onValueChange = { password = it },
             label = { Text("Contraseña") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         )
 
         Spacer(Modifier.height(20.dp))
 
         Button(
             onClick = {
-                if (email.isEmpty() || password.isEmpty()) {
-                    errorMsg = "Por favor llena todos los campos"
+                if (email.isBlank() || password.isBlank()) {
+                    // mostrar error en UI
                 } else {
-                    // Por ahora simulado, luego conectamos al backend con POST
-                    onLoginSuccess()
+                    viewModel.login(email.trim(), password)
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         ) {
             Text("Ingresar")
         }
@@ -67,8 +87,14 @@ fun LoginScreen(
         }
 
         Spacer(Modifier.height(10.dp))
-        if (errorMsg.isNotEmpty()) {
-            Text(errorMsg, color = MaterialTheme.colorScheme.error)
+
+        uiState.error?.let {
+            Text(it, color = MaterialTheme.colorScheme.error)
+        }
+
+        if (uiState.isLoading) {
+            Spacer(Modifier.height(12.dp))
+            CircularProgressIndicator()
         }
     }
 }

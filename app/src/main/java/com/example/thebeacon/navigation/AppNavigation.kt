@@ -1,18 +1,19 @@
 package com.example.thebeacon.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.thebeacon.ui.content.ContentDetailScreen
-import com.example.thebeacon.ui.content.sampleContents
 import com.example.thebeacon.ui.login.LoginScreen
 import com.example.thebeacon.ui.register.RegisterScreen
 import com.example.thebeacon.ui.home.HomeScreen
 import com.example.thebeacon.ui.profile.ProfileScreen
 import com.example.thebeacon.ui.favorites.FavoritesScreen
+import com.example.thebeacon.viewmodel.ContentDetailViewModel
 
 sealed class AppRoutes(val route: String) {
     object Login : AppRoutes("login")
@@ -64,7 +65,6 @@ fun AppNavigation() {
             )
         }
 
-
         // PROFILE
         composable(AppRoutes.Profile.route) {
             ProfileScreen(
@@ -85,25 +85,17 @@ fun AppNavigation() {
             FavoritesScreen(navController)
         }
 
+        // HOME
         composable(AppRoutes.Home.route) {
             HomeScreen(
                 onProfileClick = { navController.navigate(AppRoutes.Profile.route) },
-                onGoToDetail = { id -> navController.navigate(AppRoutes.ContentDetail.createRoute(id)) }
+                onGoToDetail = { id ->
+                    navController.navigate(AppRoutes.ContentDetail.createRoute(id))
+                }
             )
         }
 
-
-
-        composable(AppRoutes.ContentDetail.route) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("id") ?: ""
-
-            val item = sampleContents.find { it.id == id }
-
-            if (item != null) {
-                ContentDetailScreen(item = item, onBack = { navController.popBackStack() })
-            }
-        }
-
+        // DETALLE CON VIEWMODEL + API REAL
 
     }
 }

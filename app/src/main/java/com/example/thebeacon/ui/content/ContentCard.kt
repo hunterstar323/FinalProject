@@ -5,31 +5,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.style.TextOverflow
+import com.example.thebeacon.data.remote.model.Movie
 
 @Composable
-fun ContentCard(
-    item: ContentItem,
-    onClick: (ContentItem) -> Unit
-) {
+fun MovieCard(movie: Movie, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp)
-            .clickable { onClick(item) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .clickable { onClick() }
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
 
-            // Placeholder para imágenes (agregaremos Coil más tarde)
+            // Placeholder imagen
             Box(
                 modifier = Modifier
                     .size(80.dp)
@@ -38,26 +29,17 @@ fun ContentCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    item.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
+            Column {
+                Text(movie.title, style = MaterialTheme.typography.titleMedium)
 
                 Text(
-                    item.genres.joinToString(", "),
+                    movie.genre,
                     style = MaterialTheme.typography.bodySmall
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
-
                 Text(
-                    item.platforms.joinToString(" • "),
-                    style = MaterialTheme.typography.bodySmall
+                    "⭐ ${movie.average_rating}",
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
