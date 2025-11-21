@@ -6,48 +6,74 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.thebeacon.data.remote.model.Movie
+import com.example.thebeacon.viewmodel.MovieDetailViewModel
 
 @Composable
 fun ContentDetailScreen(
-    movie: Movie,
-    onBack: () -> Unit
+    movieId: String,
+    onBack: () -> Unit,
+    vm: MovieDetailViewModel = viewModel()
 ) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    val movie by vm.movie.collectAsState()
+    val loading by vm.isLoading.collectAsState()
+    val error by vm.error.collectAsState()
 
-        IconButton(onClick = onBack) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+    LaunchedEffect(Unit) {
+        vm.loadMovieById(movieId)
+    }
+
+    if (loading) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
         }
+        return
+    }
 
-        Spacer(Modifier.height(12.dp))
+    if (error != null) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Error: $error")
+        }
+        return
+    }
 
-        Text(
-            text = movie.title,
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-        Box(
+    movie?.let { data ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
-        )
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
 
-        Spacer(Modifier.height(20.dp))
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+            }
 
-        Text("Descripción", style = MaterialTheme.typography.titleMedium)
-        Text(movie.description, modifier = Modifier.padding(top = 8.dp))
+            Spacer(Modifier.height(12.dp))
+            Text(data.title, style = MaterialTheme.typography.headlineMedium)
 
-        Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(20.dp))
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+            )
 
-        Text("Género: ${movie.genre}")
+            Spacer(Modifier.height(20.dp))
 
-        Spacer(Modifier.height(10.dp))
+            Text("Descripción", style = MaterialTheme.typography.titleMedium)
+            Text(data.description)
 
-        Text("⭐ ${movie.average_rating} (${movie.rating_count} votos)")
+            Spacer(Modifier.height(20.dp))
+            Text("Género: ${data.genre}")
+            Text("⭐ ${data.average_rating} (${data.rating_count} votos)")
+        }
     }
 }

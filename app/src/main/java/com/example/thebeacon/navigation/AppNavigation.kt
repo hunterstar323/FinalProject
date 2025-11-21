@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.thebeacon.ui.addmovie.AddMovieScreen
+import com.example.thebeacon.ui.content.ContentDetailScreen
 import com.example.thebeacon.ui.login.LoginScreen
 import com.example.thebeacon.ui.register.RegisterScreen
 import com.example.thebeacon.ui.home.HomeScreen
@@ -91,5 +92,15 @@ fun AppNavigation() {
         }
 
         // (Pendiente) DETALLE REAL DE PELÍCULA — cuando tengas el viewmodel listo
+        composable(
+            route = AppRoutes.ContentDetail.route
+        ) { backStackEntry ->
+            val movieId = backStackEntry.arguments?.getString("id") ?: ""
+
+            ContentDetailScreen(
+                movieId = movieId,
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }
